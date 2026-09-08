@@ -76,22 +76,19 @@ released file; the remaining 5 are described below the table.
 estimator_compare,mix_estimator,mm1_queue,mm1_Tladder}.csv` and
 `data/experiments/{e1_*,e2_width_summary,e4_*,e5_dropout_diagnostics_n20}.csv`.
 
-### Two caveats on specific tables
+### Caveats
 
-- **`tab:sup-proxy-sensitivity`** — the original sweep script was not preserved. The released
-  cells are in `data/b13_supproxy/b13_supproxy_cells.csv`; the regeneration inputs (8 npz, 24 MB)
-  are available on request. `code/builders/build_b13.py` is included for inspection and **requires
-  the pair npz** to run. Of the table's 40 printed cells, 38 reproduce exactly; the two Kou
-  median-‖α‖ entries differ by one unit at a rounding boundary (the recomputed value is 1012.5177,
-  printed as 1012). `data/b13_supproxy/` also holds the gate checks (condition number and held-out
-  recovery both match the stored `verify_aproj.csv` / `verify_loss.csv` values exactly).
+- **Vanilla-proxy sensitivity sweep** — this table was removed from the submitted manuscript.
+  The cells (`data/b13_supproxy/b13_supproxy_cells.csv`), gate checks (`b13_gates.json`) and
+  `code/builders/build_b13.py` are kept for completeness; the script requires the eight pair npz
+  arrays, which are not redistributed and are available on request.
 - **`tab:estimator-classes`** — the printed Lilliefors column is not in
   `data/unified/estimator_compare.csv`, which carries KS and AD rejection counts; Lilliefors
   is not included (Tables S8 and S9). That column is not reproducible from the released files.
 
 ## Reproducing results
 
-With `data/` and `code/` alone, a downloader can check every published table and figure cell against the released files — the numbers in the paper are read straight out of the shipped `b9_crossfit_*.csv`, `b10_lowsnr_*.csv`/`verdict.json`, `b11_*.csv`/`b11_gates.json`, `tab_efficiency.csv`, and `b13_supproxy_cells.csv`/`b13_gates.json`, which are included in full. One of the seven builders re-runs end to end from the release tree: `build_b12.py` has no file inputs at all (closed-form mpmath evaluation at dps=40 plus a fixed-seed Monte Carlo, seed 20260902). `build_b13.py` is likewise deterministic and contains no RNG, but reads the eight `{heston,kou}_pair{A..D}.npz` arrays, which are not redistributed here and are available on request. The other five — `build_b9.py`, `build_b10.py`, `build_b10_i2.py`, `build_b11.py`, `build_b11_tree.py` — will not import here: each does `import b5_thm35_387` at module scope, and `code/b5_thm35_387.py` imports `torch` (line 37) and `TNO.common.tno_model` (line 47) unconditionally, so they raise `ModuleNotFoundError` before their cache-hit branch is ever reached. We want to be precise that this is an import-time dependency rather than a computational one: on the cached path none of the five loads a checkpoint, and four of them use nothing from that module except the closed-form `folded_normal_mean` (lines 82–87, numpy and `scipy.special.erf` only). The trained checkpoints (5.69 GB of `.pt`), the `TNO` package (`TNO/common/tno_model.py`), and the `TPDF` package (`TPDF/core/semi_closed_joint.py`, required by `code/heston_teacher.py` line 14 for the Lewis-formula ground truth) are not redistributed here and are available from the corresponding author on request. The scripts are shipped so that the exact procedure behind every published number can be inspected line by line; they are not a turnkey pipeline, and the five NN-suite builders are transparency artifacts rather than runnable ones.
+With `data/` and `code/` alone, a downloader can check every published table cell against the released files — the numbers in the paper are read straight out of the shipped `b9_crossfit_*.csv`, `b10_lowsnr_*.csv`/`verdict.json`, `b11_*.csv`/`b11_gates.json`, `tab_efficiency.csv`, and `b13_supproxy_cells.csv`/`b13_gates.json` (retained; not printed in the manuscript), which are included in full. One of the seven builders re-runs end to end from the release tree: `build_b12.py` has no file inputs at all (closed-form mpmath evaluation at dps=40 plus a fixed-seed Monte Carlo, seed 20260902). `build_b13.py` is likewise deterministic and contains no RNG, but reads the eight `{heston,kou}_pair{A..D}.npz` arrays, which are not redistributed here and are available on request. The other five — `build_b9.py`, `build_b10.py`, `build_b10_i2.py`, `build_b11.py`, `build_b11_tree.py` — will not import here: each does `import b5_thm35_387` at module scope, and `code/b5_thm35_387.py` imports `torch` (line 37) and `TNO.common.tno_model` (line 47) unconditionally, so they raise `ModuleNotFoundError` before their cache-hit branch is ever reached. We want to be precise that this is an import-time dependency rather than a computational one: on the cached path none of the five loads a checkpoint, and four of them use nothing from that module except the closed-form `folded_normal_mean` (lines 82–87, numpy and `scipy.special.erf` only). The trained checkpoints (5.69 GB of `.pt`), the `TNO` package (`TNO/common/tno_model.py`), and the `TPDF` package (`TPDF/core/semi_closed_joint.py`, required by `code/heston_teacher.py` line 14 for the Lewis-formula ground truth) are not redistributed here and are available from the corresponding author on request. The scripts are shipped so that the exact procedure behind every published number can be inspected line by line; they are not a turnkey pipeline, and the five NN-suite builders are transparency artifacts rather than runnable ones.
 
 ### Run order
 
