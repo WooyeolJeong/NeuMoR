@@ -43,8 +43,8 @@ meta/           seed_lists.csv · v2_splits.npz · suite_manifest.csv
 
 ## Table → file
 
-All 27 tables in the paper (10 in the main text, 17 in Online Resource 1). 22 are backed by a
-released file; the remaining 5 are described below the table.
+All 27 tables in the paper (10 in the main text, 17 in Online Resource 1). 23 are backed by a
+released file; the remaining 4 are described below the table.
 
 | Table | Location | Released file |
 |---|---|---|
