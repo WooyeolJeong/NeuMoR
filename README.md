@@ -35,37 +35,34 @@ meta/   seed_lists.csv · v2_splits.npz · suite_manifest.csv
 
 ## Table → file
 
-All 31 tables in the paper. 27 are data-backed; the rest are described below the table.
+All 27 tables in the paper (10 in the main text, 17 in Online Resource 1). 22 are backed by a
+released file; the remaining 5 are described below the table.
 
-| Table | Released file |
-|---|---|
-| `tab:efficiency` | `data/b12_efficiency/tab_efficiency.csv` |
-| `tab:cross-proto` | `data/legacy/correlation_by_protocol.csv` |
-| `tab:validation-summary` | `data/unified/b5_thm35_all.csv` |
-| `tab:js-decomp` | `data/unified/bias_removal_results.csv` |
-| `tab:gstar-deviation` | `data/unified/bias_reduction_gstar.csv + data/unified/bias_reduction_gstar_decomposed.csv` |
-| `tab:kernel-structure` | `data/unified/b4_table4_kernel_structure.csv` |
-| `tab:multi-event-summary` | `data/unified/multi_event_thm35.csv` |
-| `tab:lowsnr-summary` | `data/b10_lowsnr/b10_lowsnr_all.csv + data/b10_lowsnr/b10_lowsnr_summary.csv` |
-| `tab:estimator-classes` | `data/unified/estimator_compare.csv` |
-| `tab:k99-quantile` | `data/unified/multidim_hedging_per_sample.csv` |
-| `tab:sup-proxy-sensitivity` | `data/b13_supproxy/b13_supproxy_cells.csv` |
-| `tab:multi-event-distance` | `data/unified/btc_events_mahalanobis_distance.csv  <- ADD A COPY RULE: source is output/extrapolation/btc_events_mahalanobis_distance.csv, which is outside every path the assembler currently walks` |
-| `tab:per-exp-validation` | `data/unified/per_experiment_validation.csv` |
-| `tab:per-exp-gaussianity` | `data/unified/per_config_gaussianity_v2.csv + data/unified/per_experiment_gaussianity.csv` |
-| `tab:sup-boundary-stress` | `data/unified/seed_sweep_breakdown.csv` |
-| `tab:sup-estimator-cells` | `data/unified/estimator_compare.csv` |
-| `tab:sup-mix-cells` | `data/unified/mix_estimator.csv` |
-| `tab:sup-mm1` | `data/unified/mm1_queue.csv` |
-| `tab:e1-arch` | `data/experiments/e1_vs_deeponet.csv + data/experiments/e1_kou_vs_deeponet.csv` |
-| `tab:e2-width` | `data/experiments/e2_width_summary.csv` |
-| `tab:e4-burgers` | `data/experiments/e4_burgers_diagnostics.csv + data/experiments/e4_deployment_rule.csv` |
-| `tab:e5-dropout` | `data/experiments/e5_dropout_diagnostics_n20.csv` |
-| `tab:e5i-protocol` | `data/experiments/e5i_protocol_comparison.csv` |
-| `tab:e6-mlp` | `not released — its two source files live in output/mlp_replication/, a directory outside every prefix the assembler walks` |
-| `tab:b7-portfolio` | `data/unified/b7_portfolio_v2.csv` |
-| `tab:crossfit` | `data/b9_crossfit/b9_crossfit_all.csv + data/b9_crossfit/b9_crossfit_summary.csv` |
-| `tab:nongauss` | `data/b11_nongauss/b11_cells.csv + data/b11_nongauss/b11_gates.json` |
+| Table | Location | Released file |
+|---|---|---|
+| `tab:efficiency` | main text | `data/b12_efficiency/tab_efficiency.csv` |
+| `tab:cross-proto` | main text | `data/legacy/correlation_by_protocol.csv` |
+| `tab:js-decomp` | main text | `data/unified/bias_removal_results.csv` |
+| `tab:gstar-deviation` | main text | `data/unified/bias_reduction_gstar.csv + data/unified/bias_reduction_gstar_decomposed.csv` |
+| `tab:kernel-structure` | Online Resource 1 | `data/unified/b4_table4_kernel_structure.csv` |
+| `tab:multi-event-summary` | Online Resource 1 | `data/unified/multi_event_thm35.csv` |
+| `tab:lowsnr-summary` | main text | `data/b10_lowsnr/b10_lowsnr_all.csv + data/b10_lowsnr/b10_lowsnr_summary.csv` |
+| `tab:estimator-classes` | Online Resource 1 | `data/unified/estimator_compare.csv` |
+| `tab:multi-event-distance` | Online Resource 1 | `data/unified/btc_events_mahalanobis_distance.csv` |
+| `tab:per-exp-validation` | Online Resource 1 | `data/unified/per_experiment_validation.csv` |
+| `tab:per-exp-gaussianity` | Online Resource 1 | `data/unified/per_config_gaussianity_v2.csv + data/unified/per_experiment_gaussianity.csv` |
+| `tab:sup-boundary-stress` | Online Resource 1 | `data/unified/seed_sweep_breakdown.csv` |
+| `tab:sup-estimator-cells` | Online Resource 1 | `data/unified/estimator_compare.csv` |
+| `tab:sup-mix-cells` | Online Resource 1 | `data/unified/mix_estimator.csv` |
+| `tab:sup-mm1` | Online Resource 1 | `data/unified/mm1_queue.csv` |
+| `tab:e1-arch` | Online Resource 1 | `data/experiments/e1_vs_deeponet.csv + data/experiments/e1_kou_vs_deeponet.csv` |
+| `tab:e2-width` | Online Resource 1 | `data/experiments/e2_width_summary.csv` |
+| `tab:e4-burgers` | Online Resource 1 | `data/experiments/e4_burgers_diagnostics.csv + data/experiments/e4_deployment_rule.csv` |
+| `tab:e5-dropout` | Online Resource 1 | `data/experiments/e5_dropout_diagnostics_n20.csv` |
+| `tab:e5i-protocol` | Online Resource 1 | `data/experiments/e5i_protocol_comparison.csv` |
+| `tab:e6-mlp` | Online Resource 1 | `not released — its two source files live in output/mlp_replication/, a directory outside every prefix the assembler walks` |
+| `tab:crossfit` | main text | `data/b9_crossfit/b9_crossfit_all.csv + data/b9_crossfit/b9_crossfit_summary.csv` |
+| `tab:nongauss` | main text | `data/b11_nongauss/b11_cells.csv + data/b11_nongauss/b11_gates.json` |
 
 **Not backed by a single released file (4):**
 
@@ -89,8 +86,8 @@ estimator_compare,mix_estimator,mm1_queue,mm1_Tladder}.csv` and
   printed as 1012). `data/b13_supproxy/` also holds the gate checks (condition number and held-out
   recovery both match the stored `verify_aproj.csv` / `verify_loss.csv` values exactly).
 - **`tab:estimator-classes`** — the printed Lilliefors column is not in
-  `data/unified/estimator_compare.csv`, which carries the KS rejection counts only. That column
-  is not reproducible from the released files.
+  `data/unified/estimator_compare.csv`, which carries KS and AD rejection counts; Lilliefors
+  is not included (Tables S8 and S9). That column is not reproducible from the released files.
 
 ## Reproducing results
 
@@ -121,11 +118,13 @@ byte-comparable across runs.
 | File | Contents |
 |---|---|
 | `seed_lists.csv` | 25 checkpoint ensembles covering all 3,399 trained models: directory, role, filename pattern, `zero_pad` width, seed range. Seed numbering is contiguous in every ensemble but one. **`zero_pad` matters** — seed 60 is `seed_060.pt` in one ensemble and `seed_0060.pt` in another. |
-| `v2_splits.npz` | The V2 resampling permutations, materialised so they no longer depend on a NumPy RNG stream: 387 arrays of shape (20, n_seeds) for the cross-fit suite plus one (20, 200) array for the low-signal panel. Replaying these reproduces every published `V2_median` exactly. |
+| `v2_splits.npz` | The V2 resampling permutations, materialised so they no longer depend on a NumPy RNG stream: 387 arrays of shape (20, n_seeds) for the cross-fit suite plus one (20, 200) array for the low-signal panel. Replaying these reproduces every published `V2_median` exactly. The file holds 389 keys: 388
+split arrays (301 of shape (20, 200) and 87 of shape (20, 30)) plus the `b9_keys` index array
+naming the configuration each split belongs to. |
 | `suite_manifest.csv` | One row per (configuration, payoff) across the 387-configuration suite: identifiers, calibration/evaluation split sizes, and the model-parameter pair λ₁/λ₂ as JSON. |
 
 λ values are derived for **333 of 387 rows** — every Heston block. The remaining 54 (the two Kou
-stages and the BTC-informed blocks) carry `lambda_status = 미확인`; each row's `lambda_source`
+stages and the BTC-informed blocks) carry `lambda_status = not_extracted`; each row's `lambda_source`
 column names where those parameters actually live.
 
 ## What is not here
