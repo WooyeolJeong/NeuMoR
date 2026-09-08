@@ -28,6 +28,8 @@ code/   analysis scripts (transparency; see Reproducing results)
 meta/   seed_lists.csv · v2_splits.npz · suite_manifest.csv
 ```
 
+108 files, 6.0 MB: 50 CSV, 43 Python scripts, and the `meta/` index files.
+
 > **`data/legacy/` — earlier lineage.** `correlation_by_protocol.csv` comes from an earlier,
 > Heston-only experiment series whose conventions differ from the main suite. It is included
 > because Table `tab:cross-proto` is computed from it, and for no other purpose. Do not mix its
@@ -88,7 +90,7 @@ estimator_compare,mix_estimator,mm1_queue,mm1_Tladder}.csv` and
 
 ## Reproducing results
 
-With `data/` and `code/` alone, a downloader can check every published table cell against the released files — the numbers in the paper are read straight out of the shipped `b9_crossfit_*.csv`, `b10_lowsnr_*.csv`/`verdict.json`, `b11_*.csv`/`b11_gates.json`, `tab_efficiency.csv`, and `b13_supproxy_cells.csv`/`b13_gates.json` (retained; not printed in the manuscript), which are included in full. One of the seven builders re-runs end to end from the release tree: `build_b12.py` has no file inputs at all (closed-form mpmath evaluation at dps=40 plus a fixed-seed Monte Carlo, seed 20260902). `build_b13.py` is likewise deterministic and contains no RNG, but reads the eight `{heston,kou}_pair{A..D}.npz` arrays, which are not redistributed here and are available on request. The other five — `build_b9.py`, `build_b10.py`, `build_b10_i2.py`, `build_b11.py`, `build_b11_tree.py` — will not import here: each does `import b5_thm35_387` at module scope, and `code/b5_thm35_387.py` imports `torch` (line 37) and `TNO.common.tno_model` (line 47) unconditionally, so they raise `ModuleNotFoundError` before their cache-hit branch is ever reached. We want to be precise that this is an import-time dependency rather than a computational one: on the cached path none of the five loads a checkpoint, and four of them use nothing from that module except the closed-form `folded_normal_mean` (lines 82–87, numpy and `scipy.special.erf` only). The trained checkpoints (5.69 GB of `.pt`), the `TNO` package (`TNO/common/tno_model.py`), and the `TPDF` package (`TPDF/core/semi_closed_joint.py`, required by `code/heston_teacher.py` line 14 for the Lewis-formula ground truth) are not redistributed here and are available from the corresponding author on request. The scripts are shipped so that the exact procedure behind every published number can be inspected line by line; they are not a turnkey pipeline, and the five NN-suite builders are transparency artifacts rather than runnable ones.
+With `data/` and `code/` alone, a downloader can check every published table cell against the released files — the numbers in the paper are read straight out of the shipped `b9_crossfit_*.csv`, `b10_lowsnr_*.csv`/`verdict.json`, `b11_*.csv`/`b11_gates.json`, `tab_efficiency.csv`, and `b13_supproxy_cells.csv`/`b13_gates.json` (retained; not printed in the manuscript), which are included in full. Two of the seven builders also re-run end to end from this tree: `build_b12.py` has no file inputs at all (closed-form mpmath evaluation at dps=40 plus a fixed-seed Monte Carlo, seed 20260902), and `build_b13.py` is deterministic but reads the eight `{heston,kou}_pair{A..D}.npz` arrays listed below. The other five import `code/b5_thm35_387.py`, which loads `torch` and the `TNO` package at module scope, so they need the full materials; on the cached path none of them reads a checkpoint. The trained checkpoints, the `TNO` package (`TNO/common/tno_model.py`) and the `TPDF` package (`TPDF/core/semi_closed_joint.py`, used by `code/heston_teacher.py` for the Lewis-formula ground truth) are not redistributed here and are available from the corresponding author on request.
 
 ### Run order
 
@@ -136,5 +138,4 @@ column names where those parameters actually live.
   kernels, d-bar and g* that `build_b13.py` reads. Available on request.
 
 Absolute paths in the scripts have been replaced by the placeholders `<PROJECT_ROOT>`,
-`<BTC_SPOT_1M_PARQUET>` and `<BTC_DATA_ROOT>`. Some comments are in Korean; they are the
-authors' working notes and were left as written.
+`<BTC_SPOT_1M_PARQUET>` and `<BTC_DATA_ROOT>`. Some inline comments in `code/` are in Korean.
