@@ -1,9 +1,3 @@
-"""
-NeuMoR Paper — Figure & Table Generator
-Generates all 15 artifacts for the paper.
-Run from project root:
-    python NeuMoR/output/paper_artifacts/generate_all.py
-"""
 
 import sys
 import warnings
@@ -20,7 +14,6 @@ from scipy import stats
 
 warnings.filterwarnings("ignore")
 
-# ── Paths ────────────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 OUT_ROOT = Path(__file__).parent
 TABLES = OUT_ROOT / "tables"
@@ -30,7 +23,6 @@ BTC_5M = PROJECT_ROOT / "TNO" / "data" / "BTC" / "BTC_nsde_5m_full.csv"
 
 SMOOTH_PAYOFFS = {"ATM", "OTM_K110", "OTM_K125"}
 
-# ── Matplotlib style ─────────────────────────────────────────────────────────
 plt.rcParams.update({
     "font.size": 12,
     "axes.titlesize": 12,
@@ -47,7 +39,6 @@ AXIS_LABELS = {"v": r"$v$ (variance)", "kappa": r"$\kappa$ (mean rev)",
                "omega": r"$\omega$ (long var)", "xi": r"$\xi$ (vol-vol)",
                "rho": r"$\rho_{SV}$ (leverage)"}
 
-# ── LaTeX helpers ─────────────────────────────────────────────────────────────
 def to_latex(df: pd.DataFrame, caption: str, label: str,
              float_fmt: str = "{:.4f}", index: bool = False) -> str:
     n_cols = len(df.columns)
@@ -75,7 +66,6 @@ def to_latex(df: pd.DataFrame, caption: str, label: str,
     lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
     return "\n".join(lines)
 
-
 def save_table(df: pd.DataFrame, name: str, caption: str, label: str,
                float_fmt: str = "{:.4f}", index: bool = False):
     csv_path = TABLES / f"{name}.csv"
@@ -85,7 +75,6 @@ def save_table(df: pd.DataFrame, name: str, caption: str, label: str,
     tex_path.write_text(tex)
     print(f"  Saved {csv_path.name} + {tex_path.name}")
 
-
 def save_fig(fig: plt.Figure, name: str):
     png_path = FIGS / f"{name}.png"
     pdf_path = FIGS / f"{name}.pdf"
@@ -94,18 +83,12 @@ def save_fig(fig: plt.Figure, name: str):
     plt.close(fig)
     print(f"  Saved {png_path.name} + {pdf_path.name}")
 
-
-FLAGS = []  # collect issues found
-
+FLAGS = []
 
 def flag(msg: str):
     print(f"  [FLAG] {msg}")
     FLAGS.append(msg)
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TABLE 4.1 — Per-axis α values (smooth payoffs only)
-# ══════════════════════════════════════════════════════════════════════════════
 def make_table_4_1():
     print("\n[Table 4.1] Per-axis α values")
     df = pd.read_csv(EXP / "exp05" / "alpha_per_axis.csv")
@@ -119,7 +102,7 @@ def make_table_4_1():
         mean_a = np.mean(alphas)
         std_a  = np.std(alphas, ddof=1)
         se_a   = std_a / np.sqrt(len(alphas))
-        # 95% CI using t(2) = 4.303
+
         ci_lo  = mean_a - 4.303 * se_a
         ci_hi  = mean_a + 4.303 * se_a
         mean_r2 = np.mean(r2s)
@@ -133,7 +116,6 @@ def make_table_4_1():
 
     out = pd.DataFrame(rows)
 
-    # Flag: R² range check
     min_r2 = df_smooth["r2"].min()
     max_r2 = df_smooth["r2"].max()
     if min_r2 < 0.92:
@@ -148,15 +130,11 @@ def make_table_4_1():
                float_fmt="{:.3f}")
     return out
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 4.1 — (1−ρ) vs Δλ per axis (log-log)
-# ══════════════════════════════════════════════════════════════════════════════
 def make_fig_4_1():
     print("\n[Figure 4.1] (1-ρ) vs Δλ per axis")
     df_multi = pd.read_csv(EXP / "exp05" / "theorem1prime_multiaxis.csv")
     df_alpha = pd.read_csv(EXP / "exp05" / "anisotropic_parameters.csv")
-    df_smooth = df_multi[df_multi["payoff"] == "ATM"]  # use ATM as representative
+    df_smooth = df_multi[df_multi["payoff"] == "ATM"]
 
     axes_list = ["v", "kappa", "omega", "xi", "rho"]
     fig, axs = plt.subplots(2, 3, figsize=(12, 7))
@@ -165,18 +143,16 @@ def make_fig_4_1():
     for idx, axis in enumerate(axes_list):
         ax = axs_flat[idx]
         sub = df_smooth[df_smooth["axis"] == axis].copy()
-        sub = sub[sub["rho"] < 0.9999]  # exclude degenerate
+        sub = sub[sub["rho"] < 0.9999]
 
         deltas = sub["delta"].abs().values
         rho_vals = sub["rho"].values
         one_minus_rho = 1.0 - rho_vals
 
-        # Get fit params
         fits = df_alpha[(df_alpha["axis"] == axis) & (df_alpha["payoff"] == "ATM")]
         alpha_fit = fits["alpha"].values[0]
         C_fit     = fits["C"].values[0]
 
-        # Filter positive 1-rho
         mask = one_minus_rho > 0
         deltas = deltas[mask]
         one_minus_rho = one_minus_rho[mask]
@@ -184,7 +160,6 @@ def make_fig_4_1():
         ax.loglog(deltas, one_minus_rho, "o", color=AXIS_COLORS[axis],
                   ms=6, label="data")
 
-        # Fit line
         d_range = np.logspace(np.log10(deltas.min()), np.log10(deltas.max()), 50)
         ax.loglog(d_range, C_fit * d_range**alpha_fit, "-", color="k",
                   lw=1.5, label=rf"$\alpha={alpha_fit:.2f}$")
@@ -195,25 +170,19 @@ def make_fig_4_1():
         ax.legend(fontsize=9)
         ax.grid(True, alpha=0.3, which="both")
 
-    # Hide the 6th panel
     axs_flat[-1].set_visible(False)
     fig.suptitle(r"Anisotropic Correlation Decay: $(1-\rho) \sim C_a |\Delta\lambda_a|^{\alpha_a}$",
                  y=1.01)
     fig.tight_layout()
     save_fig(fig, "fig_4_1")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 4.2 — Kernel eigenvalue spectrum
-# ══════════════════════════════════════════════════════════════════════════════
 def make_fig_4_2():
     print("\n[Figure 4.2] Kernel eigenvalue spectrum")
     df = pd.read_csv(EXP / "exp04" / "kernel_eigenvalues.csv")
     eigs = df["eigenvalue"].values
 
-    # Effective rank: r_eff = (Σλ)² / Σλ²
     r_eff = (eigs.sum())**2 / (eigs**2).sum()
-    # Participation ratio: same formula
+
     pr    = r_eff
 
     fig, ax = plt.subplots(figsize=(7, 4))
@@ -233,10 +202,6 @@ def make_fig_4_2():
     if r_eff < 10:
         flag(f"Figure 4.2: effective rank r_eff={r_eff:.1f} is quite low — kernel highly structured.")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 4.3 — g* payoff shape vs ATM
-# ══════════════════════════════════════════════════════════════════════════════
 def make_fig_4_3():
     print("\n[Figure 4.3] g* payoff shape vs ATM")
     df = pd.read_csv(EXP / "exp10" / "payoffs.csv")
@@ -248,10 +213,8 @@ def make_fig_4_3():
         y   = sub["y"].values
         g_star = sub["g_A_tikh"].values
 
-        # ATM call payoff: max(e^y - 1, 0)
         atm = np.maximum(np.exp(y) - 1.0, 0.0)
 
-        # Normalize both for shape comparison
         g_star_norm = g_star / (np.abs(g_star).max() + 1e-15)
         atm_norm    = atm / (atm.max() + 1e-15)
 
@@ -269,16 +232,11 @@ def make_fig_4_3():
     fig.tight_layout()
     save_fig(fig, "fig_4_3")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TABLE 5.1 — Theorem 3.1 validation summary
-# ══════════════════════════════════════════════════════════════════════════════
 def make_table_5_1():
     print("\n[Table 5.1] Theorem 3.1 validation summary")
 
     records = []
 
-    # --- Exp01: in-sample ---
     df = pd.read_csv(EXP / "exp01" / "theorem_1_prime.csv")
     df_s = df[df["payoff"].isin(SMOOTH_PAYOFFS)]
     ratios = df_s["ratio_prime"].dropna().values
@@ -288,7 +246,6 @@ def make_table_5_1():
                         Ratio_min=ratios.min(), Ratio_max=ratios.max(),
                         All_pass=all(0.7 <= r <= 1.3 for r in ratios)))
 
-    # --- Exp02: OoS cross-val ---
     df = pd.read_csv(EXP / "exp02" / "cv_test.csv")
     df_s = df[df["payoff"].isin(SMOOTH_PAYOFFS)]
     ratios = df_s["ratio_cv"].dropna().values
@@ -298,7 +255,6 @@ def make_table_5_1():
                         Ratio_min=ratios.min(), Ratio_max=ratios.max(),
                         All_pass=all(0.7 <= r <= 1.3 for r in ratios)))
 
-    # --- Exp03: cross-protocol (AA protocol only = same conditions) ---
     df = pd.read_csv(EXP / "exp03" / "jensen_isolation_testA.csv")
     df_s = df[df["payoff"].isin(SMOOTH_PAYOFFS)]
     ratios = df_s["ratio"].dropna().values
@@ -308,7 +264,6 @@ def make_table_5_1():
                         Ratio_min=ratios.min(), Ratio_max=ratios.max(),
                         All_pass=all(0.7 <= r <= 1.3 for r in ratios)))
 
-    # --- Exp05 multi-axis ---
     df = pd.read_csv(EXP / "exp05" / "theorem1prime_multiaxis.csv")
     df_s = df[df["payoff"].isin(SMOOTH_PAYOFFS)]
     ratios = df_s["ratio"].dropna().values
@@ -318,7 +273,6 @@ def make_table_5_1():
                         Ratio_min=ratios.min(), Ratio_max=ratios.max(),
                         All_pass=all(0.7 <= r <= 1.3 for r in ratios)))
 
-    # --- Exp05 diagonal ---
     df = pd.read_csv(EXP / "exp05" / "diagonal_sweeps.csv")
     df_s = df[df["payoff"].isin(SMOOTH_PAYOFFS)]
     ratios = df_s["ratio"].dropna().values
@@ -328,7 +282,6 @@ def make_table_5_1():
                         Ratio_min=ratios.min(), Ratio_max=ratios.max(),
                         All_pass=all(0.7 <= r <= 1.3 for r in ratios)))
 
-    # --- Exp06 edge cases ---
     df = pd.read_csv(EXP / "exp06" / "edge_case_distributions.csv")
     df_s = df[df["payoff"].isin(SMOOTH_PAYOFFS)]
     ratios = df_s["ratio"].dropna().values
@@ -338,10 +291,9 @@ def make_table_5_1():
                         Ratio_min=ratios.min(), Ratio_max=ratios.max(),
                         All_pass=all(0.7 <= r <= 1.3 for r in ratios)))
 
-    # --- Exp09 real BTC ---
     df = pd.read_csv(EXP / "exp09" / "theorem1prime_realmarket.csv")
     df_s = df[df["payoff"].isin(SMOOTH_PAYOFFS)]
-    # Use ratio_lam1 as the main validation ratio
+
     ratios = df_s["ratio_lam1"].dropna().values
     records.append(dict(Experiment="Exp 09 (real BTC)",
                         Type="4 calibration windows × 3 smooth payoffs",
@@ -355,7 +307,6 @@ def make_table_5_1():
     print(f"    Total smooth configs: {total_configs}")
     print(f"    All pass [0.7, 1.3]: {total_pass}")
 
-    # Check ratios
     all_ratios_combined = []
     for rec in records:
         all_ratios_combined.extend([rec["Ratio_min"], rec["Ratio_max"]])
@@ -364,7 +315,6 @@ def make_table_5_1():
     if global_min < 0.7 or global_max > 1.3:
         flag(f"Table 5.1: Some ratios outside [0.7, 1.3]. Range: [{global_min:.4f}, {global_max:.4f}]")
 
-    # Format for display
     display_df = out_df.copy()
     display_df["Ratio range"] = display_df.apply(
         lambda r: f"[{r['Ratio_min']:.3f}, {r['Ratio_max']:.3f}]", axis=1)
@@ -378,17 +328,12 @@ def make_table_5_1():
                label="tab:thm31_validation")
     return out_df
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TABLE 5.2 — Cross-protocol correlation isolation (Theorem 4.1)
-# ══════════════════════════════════════════════════════════════════════════════
 def make_table_5_2():
     print("\n[Table 5.2] Cross-protocol correlation isolation")
     df = pd.read_csv(EXP / "exp03" / "correlation_by_protocol.csv")
-    # ATM payoff only, pairs A and D (representative small & medium regime)
+
     sub = df[(df["payoff"] == "ATM") & (df["pair"].isin(["A", "D"]))].copy()
 
-    # Compute sigma_delta and |s|
     sub["sigma_delta_fmt"] = sub["sigma_delta"].apply(lambda x: f"{x:.4e}")
     sub["|s|"] = sub["s"].abs().round(2)
 
@@ -404,7 +349,6 @@ def make_table_5_2():
     pivot.columns.name = None
     pivot = pivot.rename(columns={"A": "ρ (Pair A)", "D": "ρ (Pair D)"})
 
-    # Add protocol order
     order = ["Same arch + loss", "Same arch, diff loss",
              "Same arch, MSE only", "Same arch + λ noise",
              "Same (loss 1)", "Same (loss 2)"]
@@ -418,15 +362,10 @@ def make_table_5_2():
                label="tab:protocol_correlation",
                float_fmt="{:.4f}")
 
-    # Flag if any protocol gives unexpected very negative rho
     neg = df[df["rho"] < -0.5]
     if len(neg) > 0:
         flag(f"Table 5.2: {len(neg)} (protocol, pair, payoff) combos have ρ < -0.5 (max neg: {neg['rho'].min():.3f})")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 5.1 — Theoretical vs empirical bias scatter
-# ══════════════════════════════════════════════════════════════════════════════
 def make_fig_5_1():
     print("\n[Figure 5.1] Theoretical vs empirical bias scatter")
 
@@ -445,37 +384,31 @@ def make_fig_5_1():
         keep = keep[(keep["_emp"] > 0) & (keep["_theory"] > 0)]
         return keep
 
-    # exp01
     all_dfs.append(load_and_tag(EXP / "exp01" / "theorem_1_prime.csv",
         "Exp01 (pairs A-E)", "bias_empirical", "bias_theory_prime",
         "payoff", SMOOTH_PAYOFFS))
 
-    # exp02
     all_dfs.append(load_and_tag(EXP / "exp02" / "cv_test.csv",
         "Exp02 (OoS CV)", "E_abs_test", "E_abs_pred",
         "payoff", SMOOTH_PAYOFFS))
 
-    # exp05 multiaxis
     all_dfs.append(load_and_tag(EXP / "exp05" / "theorem1prime_multiaxis.csv",
         "Exp05 (multi-axis)", "bias_emp", "bias_pred",
         "payoff", SMOOTH_PAYOFFS))
 
-    # exp05 diagonal
     all_dfs.append(load_and_tag(EXP / "exp05" / "diagonal_sweeps.csv",
         "Exp05 (diagonal)", "bias_emp", "bias_pred",
         "payoff", SMOOTH_PAYOFFS))
 
-    # exp06
     all_dfs.append(load_and_tag(EXP / "exp06" / "edge_case_distributions.csv",
         "Exp06 (edge cases)", "bias_emp", "bias_pred",
         "payoff", SMOOTH_PAYOFFS))
 
-    # exp09
     all_dfs.append(load_and_tag(EXP / "exp09" / "theorem1prime_realmarket.csv",
         "Exp09 (real BTC)", "mu1", "ratio_lam1",
         "payoff", SMOOTH_PAYOFFS))
-    # exp09 ratio_lam1 is already ratio, not absolute bias; skip for scatter
-    all_dfs = all_dfs[:-1]  # drop exp09 which has different format
+
+    all_dfs = all_dfs[:-1]
 
     combined = pd.concat(all_dfs, ignore_index=True)
     tags = combined["_tag"].unique()
@@ -488,7 +421,6 @@ def make_fig_5_1():
                   color=COLORS[i % len(COLORS)], ms=4, alpha=0.7,
                   label=f"{tag} (n={len(sub)})")
 
-    # y=x line
     all_vals = combined[["_emp", "_theory"]].values.flatten()
     all_vals = all_vals[all_vals > 0]
     v_min, v_max = all_vals.min(), all_vals.max()
@@ -497,7 +429,6 @@ def make_fig_5_1():
                     [1.3 * v_min, 1.3 * v_max], alpha=0.1, color="gray",
                     label="±30% band")
 
-    # Regression line
     log_t = np.log(combined["_theory"].values)
     log_e = np.log(combined["_emp"].values)
     slope, intercept, r_val, _, _ = stats.linregress(log_t, log_e)
@@ -519,16 +450,11 @@ def make_fig_5_1():
     if in_band / total_n < 0.90:
         flag(f"Figure 5.1: only {100*in_band/total_n:.1f}% of points in ±30% band (expected >90%)")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 5.2 — SNR convergence (g* vs ATM, N dependency)
-# ══════════════════════════════════════════════════════════════════════════════
 def make_fig_5_2():
     print("\n[Figure 5.2] SNR convergence")
     df = pd.read_csv(EXP / "exp07_6" / "snr_convergence_extended.csv")
     fits = pd.read_csv(EXP / "exp07_6" / "convergence_fits_extended.csv")
 
-    # Use tau_0.01 held_out
     sub = df[(df["scheme"] == "tau_0.01") & (df["eval_type"] == "held_out")].copy()
 
     fig, ax = plt.subplots(figsize=(8, 5))
@@ -539,7 +465,6 @@ def make_fig_5_2():
         ax.plot(N_vals, snr_vals, "o-", color=PAIR_COLORS[pair], lw=1.5,
                 ms=5, label=f"Pair {pair}")
 
-        # Asymptotic line from fits
         fit_row = fits[(fits["pair"] == pair) & (fits["scheme"] == "tau_0.01")]
         if len(fit_row) > 0 and fit_row["best_model"].values[0] in ["H3", "H1"]:
             snr_inf = fit_row["SNR_inf_best"].values[0]
@@ -553,7 +478,6 @@ def make_fig_5_2():
     ax.legend(fontsize=10)
     ax.grid(True, alpha=0.3)
 
-    # Print asymptotic values
     for pair in ["A", "B", "C", "D", "E"]:
         fit_row = fits[(fits["pair"] == pair) & (fits["scheme"] == "tau_0.01")]
         if len(fit_row) > 0:
@@ -563,7 +487,6 @@ def make_fig_5_2():
     fig.tight_layout()
     save_fig(fig, "fig_5_2")
 
-    # Check claims
     fit_main = fits[fits["scheme"] == "tau_0.01"]
     inf_vals = fit_main["SNR_inf_best"].dropna().values
     print(f"    SNR_∞ range: [{inf_vals.min():.3f}, {inf_vals.max():.3f}]")
@@ -571,25 +494,20 @@ def make_fig_5_2():
         flag(f"Figure 5.2: SNR_∞ range [{inf_vals.min():.3f}, {inf_vals.max():.3f}] "
              f"deviates from skeleton claim [1.8, 2.9]")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TABLE 5.3 — Gaussian assumption tests (Assumption A1)
-# ══════════════════════════════════════════════════════════════════════════════
 def make_table_5_3():
     print("\n[Table 5.3] Gaussian assumption tests")
     df = pd.read_csv(EXP / "exp06" / "sub_gaussian_bounds.csv")
-    # All 20 configs (5 pairs × 4 payoffs, including DIGITAL for completeness)
+
     ratios = df["ratio_sg_vs_gauss"].values
     print(f"    σ_sg/σ_gauss: mean={ratios.mean():.4f}, std={ratios.std():.4f}, "
           f"range=[{ratios.min():.4f}, {ratios.max():.4f}]")
 
-    # Normality tests from exp02
     df_norm = pd.read_csv(EXP / "exp02" / "normality_tests.csv")
     n_tests = len(df_norm)
     n_reject_ks  = (df_norm["ks_p"] < 0.05).sum()
     n_reject_sw  = (df_norm["ad_reject5"].sum()) if "ad_reject5" in df_norm.columns else \
                    (df_norm["shapiro_p"] < 0.05).sum()
-    mean_r2 = 0.9994  # from skeleton; not directly in this csv
+    mean_r2 = 0.9994
 
     rows = [
         {"Test": "KS normality (exp02)", "Statistic": "KS $p$-value",
@@ -599,7 +517,7 @@ def make_table_5_3():
         {"Test": "AD test (exp02)", "Statistic": "AD statistic",
          "N tests": n_tests, "Result": f"{int(n_reject_sw)}/{n_tests} rejections at 5\\%"},
     ]
-    # Edge cases
+
     df_edge = pd.read_csv(EXP / "exp06" / "edge_case_distributions.csv")
     df_edge_smooth = df_edge[df_edge["payoff"].isin(SMOOTH_PAYOFFS)]
     n_edge = len(df_edge_smooth)
@@ -619,15 +537,10 @@ def make_table_5_3():
     if ratios.max() > 1.05:
         flag(f"Table 5.3: σ_sg/σ_gauss max = {ratios.max():.4f} > 1.05 (Pair E effects?)")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TABLE 5.4 — BTC calibration parameters
-# ══════════════════════════════════════════════════════════════════════════════
 def make_table_5_4():
     print("\n[Table 5.4] BTC calibration parameters")
     df = pd.read_csv(EXP / "exp12" / "calibrations.csv")
 
-    # Check raw vs clipped from exp09
     df09 = pd.read_csv(EXP / "exp09" / "calibrations.csv")
     print(f"    exp09 raw kappa range: [{df09['raw_kappa'].min():.0f}, {df09['raw_kappa'].max():.0f}]")
     print(f"    exp09 raw xi range:    [{df09['raw_xi'].min():.2f}, {df09['raw_xi'].max():.2f}]")
@@ -660,36 +573,27 @@ def make_table_5_4():
         flag("Table 5.4: ALL BTC scenarios are clipped — all κ and ξ exceed training range. "
              "This is a significant out-of-distribution concern for all real-world results.")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 5.3 — BTC realized variance with calibration windows
-# ══════════════════════════════════════════════════════════════════════════════
 def make_fig_5_3():
     print("\n[Figure 5.3] BTC realized variance timeline")
-    # Load 5m data
+
     df = pd.read_csv(BTC_5M)
     df["time"] = pd.to_datetime(df["time_kst"], utc=True)
     df = df.set_index("time").sort_index()
 
-    # Filter 2020-01 to 2024-05
     df = df["2020-01-01":"2024-05-01"]
 
-    # Daily realized variance: sum of squared 5m returns, annualized
-    # 5m returns: 288 per day. Annualize × 252.
     daily_rv = df["log_return"].resample("1D").apply(
         lambda r: (r**2).sum() * 252 if len(r) > 10 else np.nan
     ).dropna()
 
-    # 30-day rolling mean for smoothness
     rv_smooth = daily_rv.rolling(30, min_periods=10).mean()
 
-    # Calibration windows from exp09
     windows_09 = {
         "Luna (W1)": ("2022-05-05", "2022-05-20"),
         "FTX (W2)":  ("2022-11-04", "2022-11-19"),
         "ETF app. (W3)": ("2024-01-08", "2024-01-23"),
     }
-    # exp12 model pair windows (approximate from descriptions)
+
     scenario_pairs = {
         "Luna": ("2022-02-01", "2022-08-01", COLORS[0]),
         "FTX":  ("2022-09-01", "2023-01-01", COLORS[1]),
@@ -706,12 +610,10 @@ def make_fig_5_3():
     ax.plot(rv_smooth.index, rv_smooth.values, lw=1.5, color="steelblue",
             label="30-day RV (ann.)")
 
-    # Shade scenario windows
     for name, (t0, t1, color) in scenario_pairs.items():
         ax.axvspan(pd.Timestamp(t0), pd.Timestamp(t1),
                    alpha=0.12, color=color, label=f"{name} window")
 
-    # Key events
     for evt, date in key_events.items():
         ax.axvline(pd.Timestamp(date), ls="--", color="red", lw=1, alpha=0.6)
         ax.text(pd.Timestamp(date), ax.get_ylim()[1] * 0.85 if ax.get_ylim()[1] > 0 else 5,
@@ -726,10 +628,6 @@ def make_fig_5_3():
     fig.tight_layout()
     save_fig(fig, "fig_5_3")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TABLE 6.1 — Portfolio composition
-# ══════════════════════════════════════════════════════════════════════════════
 def make_table_6_1():
     print("\n[Table 6.1] Portfolio composition")
     df = pd.read_csv(EXP / "exp12" / "portfolio.csv")
@@ -754,10 +652,6 @@ def make_table_6_1():
                        r"Position sizes in number of contracts; notional $\approx \$50M$.",
                label="tab:portfolio_composition")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TABLE 6.2 — Capital charge comparison
-# ══════════════════════════════════════════════════════════════════════════════
 def make_table_6_2():
     print("\n[Table 6.2] Capital charge comparison")
     df = pd.read_csv(EXP / "exp12" / "capital_implications.csv")
@@ -791,10 +685,6 @@ def make_table_6_2():
         flag(f"Table 6.2: Capital saving range [{savings.min():.1f}%, {savings.max():.1f}%] "
              f"deviates from claimed [56%, 86%].")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TABLE 6.3 — Decision accuracy
-# ══════════════════════════════════════════════════════════════════════════════
 def make_table_6_3():
     print("\n[Table 6.3] Decision accuracy")
     df = pd.read_csv(EXP / "exp12" / "decision_analysis.csv")
@@ -818,15 +708,10 @@ def make_table_6_3():
                        r"ETF scenario is the key differentiator: Naive ATM gives 100\% FP rate.",
                label="tab:decision_accuracy")
 
-    # Check ETF result
     etf_atm = df[(df["scenario"] == "ETF") & (df["strategy"] == "Naive ATM")]
     if len(etf_atm) > 0 and etf_atm["fp_rate"].values[0] != 1.0:
         flag("Table 6.3: ETF Naive ATM FP rate != 1.0 — double check.")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 6.1 — Capital saving bar chart
-# ══════════════════════════════════════════════════════════════════════════════
 def make_fig_6_1():
     print("\n[Figure 6.1] Capital saving bar chart")
     df = pd.read_csv(EXP / "exp12" / "capital_implications.csv")
@@ -850,7 +735,6 @@ def make_fig_6_1():
                       vals, width, label=strat_lbl,
                       color=COLORS[j], alpha=0.85)
 
-        # Annotate saving %
         if strat == "Position-specific":
             for xi, (scen, val) in zip(x, zip(scenarios, vals)):
                 save_row = df[(df["scenario"] == scen) & (df["strategy"] == strat)]
@@ -868,16 +752,11 @@ def make_fig_6_1():
     fig.tight_layout()
     save_fig(fig, "fig_6_1")
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# MAIN
-# ══════════════════════════════════════════════════════════════════════════════
 if __name__ == "__main__":
     print("=" * 70)
     print("NeuMoR Paper Artifact Generator")
     print("=" * 70)
 
-    # Tables
     make_table_4_1()
     make_table_5_1()
     make_table_5_2()
@@ -887,7 +766,6 @@ if __name__ == "__main__":
     make_table_6_2()
     make_table_6_3()
 
-    # Figures
     make_fig_4_1()
     make_fig_4_2()
     make_fig_4_3()
@@ -896,7 +774,6 @@ if __name__ == "__main__":
     make_fig_5_3()
     make_fig_6_1()
 
-    # Summary
     print("\n" + "=" * 70)
     print("SUMMARY")
     print("=" * 70)
@@ -913,7 +790,6 @@ if __name__ == "__main__":
     else:
         print("\nNo flags raised — all values consistent with claims.")
 
-    # Write summary.md
     summary_lines = [
         "# NeuMoR Paper Artifacts — Generation Summary\n",
         f"Generated: 2026-04-21\n",
