@@ -1,0 +1,10 @@
+exp_label,n_configs,ks_p_median,ks_p_min,ks_reject_pct,ad_p_median,ad_p_min,ad_reject_pct,sw_p_median,sw_p_min,sw_reject_pct
+Exp 01 (Heston in-sample),15,0.6164,0.4871,0.0,0.2263,0.1069,0.0,0.3702,0.2017,0.0
+Exp 02 (Heston OOS cross-validation),39,0.633,0.4425,0.0,0.2599,0.0769,0.0,0.3388,0.1551,0.0
+Exp 03 (Heston cross-protocol),90,0.8998,0.4497,0.0,0.512,0.0159,4.44,0.6426,0.0109,5.56
+Exp 05 (Heston multi-axis perturbations),165,0.8548,0.1626,0.0,0.4823,0.0071,4.85,0.3958,0.0213,1.82
+Exp 06 (Heston edge regimes),24,0.9014,0.5736,0.0,0.5526,0.2526,0.0,0.3976,0.1839,0.0
+Exp 09 (Heston BTC-calibrated clipped),12,0.8327,0.6484,0.0,0.4524,0.1378,0.0,0.1282,0.0138,33.33
+Kou Stage A,12,0.857,0.6643,0.0,0.505,0.22,0.0,0.6214,0.2027,0.0
+Kou Stage B,12,0.6403,0.1187,0.0,0.2968,0.0031,33.33,0.2974,0.0128,25.0
+BTC Kou in-box,18,0.7939,0.1715,0.0,0.3963,0.1048,0.0,0.3578,0.0727,0.0

@@ -1,0 +1,7 @@
+scenario,sigma,lam_J,p,eta1,eta2,all_in_range
+Luna_pre,0.587,28.7,0.43,9.3,13.9,True
+Luna_post,0.74,20.7,0.33,12.3,7.4,True
+FTX_pre,0.405,27.2,0.6,15.3,12.8,True
+FTX_post,0.553,13.8,0.5,10.0,6.6,True
+ETF_pre,0.438,36.5,0.57,17.6,19.5,True
+ETF_post,0.599,27.0,0.5,11.6,12.7,True

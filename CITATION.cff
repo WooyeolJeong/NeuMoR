@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this data or code, please cite the paper below."
+title: "Replication data and code for: The folding bias of training noise in paired surrogate comparisons"
+type: dataset
+license: MIT
+authors:
+  - family-names: Jeong
+    given-names: Wooyeol
+    affiliation: "Department of Mathematics, Yonsei University, Seoul, Republic of Korea"
+  - family-names: Seo
+    given-names: Monghwan
+    affiliation: "Department of Mathematics, Yonsei University, Seoul, Republic of Korea"
+  - family-names: Lee
+    given-names: Sungchul
+    affiliation: "Department of Mathematics, Yonsei University, Seoul, Republic of Korea"
+preferred-citation:
+  type: article
+  title: "The folding bias of training noise in paired surrogate comparisons"
+  authors:
+    - family-names: Jeong
+      given-names: Wooyeol
+    - family-names: Seo
+      given-names: Monghwan
+    - family-names: Lee
+      given-names: Sungchul
+  year: 2026

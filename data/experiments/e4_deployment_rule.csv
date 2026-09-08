@@ -1,0 +1,17 @@
+pair,qoi,atom,kurt_nf,abs_s,alarm,rej_lil
+A,L1,0.0,2.972,0.0632,False,False
+A,L2,0.0,2.9852,0.0759,False,False
+A,M,0.0,2.1195,12.5169,False,False
+A,E,0.78,5.7168,0.4604,True,True
+B,L1,0.0,3.2679,0.0294,False,False
+B,L2,0.0,2.2475,0.0079,False,False
+B,M,0.0,2.4528,13.5222,False,False
+B,E,0.38,2.0532,1.0679,True,True
+C,L1,0.0,2.6654,0.064,False,False
+C,L2,0.0,2.3043,0.0637,False,False
+C,M,0.0,2.7056,13.7079,False,False
+C,E,0.0,6.7039,2.2118,False,True
+D,L1,0.0,2.5174,0.1342,False,False
+D,L2,0.0,3.3392,0.1788,False,False
+D,M,0.0,2.4895,24.2982,False,False
+D,E,0.0,4.8366,5.4615,False,True
